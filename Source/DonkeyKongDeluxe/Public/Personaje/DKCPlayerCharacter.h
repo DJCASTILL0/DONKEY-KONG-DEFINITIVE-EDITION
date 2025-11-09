@@ -4,15 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-
-#include "Estados/PlayerBaseState.h" 
-#include "Estrategias/PlayerStrategy.h" 
-
-// EL ARCHIVO .GENERATED.H SIEMPRE DEBE SER EL ULTIMO INCLUDE
 #include "DKCPlayerCharacter.generated.h" 
 
+// Declaraciones anticipadas
 class USpringArmComponent;
 class UCameraComponent;
+class UPlayerBaseState;
+class UPlayerStrategy;
+class UComponenteSalud;
+class UDKCHud;
+class UComponenteInventario;
 
 UCLASS()
 class DONKEYKONGDELUXE_API ADKCPlayerCharacter : public ACharacter
@@ -21,40 +22,42 @@ class DONKEYKONGDELUXE_API ADKCPlayerCharacter : public ACharacter
 
 public:
 	ADKCPlayerCharacter();
+	virtual void Tick(float DeltaTime) override;
+	virtual void Jump() override;
+	void CambiarEstado(UPlayerBaseState* NuevoEstado);
+	void EjecutarRodarAccion();
+	void SetEstrategia(TSubclassOf<UPlayerStrategy> NuevaClaseEstrategia);
+	FORCEINLINE UComponenteSalud* GetComponenteSalud() const { return ComponenteSalud; }
+	FORCEINLINE UComponenteInventario* GetComponenteInventario() const { return ComponenteInventario; }
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camara")
+	// Componentes (Necesitan UPROPERTY para Recoleccion de Basura)
+	UPROPERTY()
 	USpringArmComponent* BrazoCamara;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camara")
+	UPROPERTY()
 	UCameraComponent* CamaraSeguimiento;
+	UPROPERTY()
+	UComponenteSalud* ComponenteSalud;
+	UPROPERTY()
+	UComponenteInventario* ComponenteInventario;
+	// Patrones (Necesitan UPROPERTY para Recoleccion de Basura)
+	UPROPERTY()
+	UPlayerBaseState* EstadoActual;
+	UPROPERTY()
+	UPlayerStrategy* EstrategiaActual;
 
-	// **LOGICA DEL PERSONAJE**
+
+	// Logica de Personaje
 	void MoverDerecha(float Valor);
 	void SaltarPresionado();
 	void RodarPresionado();
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// **LOGICA DEL PATRON STATE**
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Patron State")
-	UPlayerBaseState* EstadoActual;
-
-	// **LOGICA DEL PATRON STRATEGY**
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Patron Estrategia")
-	UPlayerStrategy* EstrategiaActual;
-
-public:
-	virtual void Tick(float DeltaTime) override;
-	void CambiarEstado(UPlayerBaseState* NuevoEstado);
-	virtual void Jump() override;
-
-	// Funcion publica llamada por el Estado para ejecutar la accion del Roll (delegan a la Estrategia)
-	void EjecutarRodarAccion();
-	void SetEstrategia(TSubclassOf<UPlayerStrategy> NuevaClaseEstrategia);
-	FORCEINLINE UPlayerBaseState* GetEstadoActual() const { return EstadoActual; }
-
-	// ELIMINACION: La logica de overlap de lianas/interactuar ha sido eliminada por completo.
+	// Callbacks (Necesitan UFUNCTION para delegados y colisiones)
+	UFUNCTION()
+	void AlJugadorMorir();
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

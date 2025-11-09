@@ -15,6 +15,12 @@ private:
 	const float DuracionMaximaRoll = 0.5f;
 	float TiempoRollActual;
 
+	// Variable para guardar la friccion original
+	float FriccionSueloOriginal;
+
+	// Fuerza del impulso
+	float FuerzaRoll;
+
 public:
 	UEstadoRodarTierra();
 
@@ -22,7 +28,6 @@ public:
 	virtual void OnExit() override;
 	virtual void TickState(float DeltaTime) override;
 
-	// Bloqueamos cualquier otra accion mientras rodamos
 	virtual void ManejarInputSalto() override {}
 	virtual void ManejarInputRodar() override {}
 };
