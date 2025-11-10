@@ -1,5 +1,4 @@
 // RUTA: Source/DonkeyKongDeluxe/Public/Estados/EstadoRodarTierra.h
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -14,20 +13,18 @@ class DONKEYKONGDELUXE_API UEstadoRodarTierra : public UPlayerBaseState
 private:
 	const float DuracionMaximaRoll = 0.5f;
 	float TiempoRollActual;
-
-	// Variable para guardar la friccion original
 	float FriccionSueloOriginal;
-
-	// Fuerza del impulso
 	float FuerzaRoll;
 
 public:
 	UEstadoRodarTierra();
 
-	virtual void OnEnter(ADKCPlayerCharacter* PersonajeReferencia) override;
+	// (LA CORRECCIÓN) La firma C++ ahora coincide con PlayerBaseState.h
+	virtual void OnEnter(ADKCPlayerCharacter* PersonajeReferencia, AActor* ActorReferencia = nullptr) override;
+
 	virtual void OnExit() override;
 	virtual void TickState(float DeltaTime) override;
-
 	virtual void ManejarInputSalto() override {}
 	virtual void ManejarInputRodar() override {}
+	virtual bool EstaAtacando() const override;
 };

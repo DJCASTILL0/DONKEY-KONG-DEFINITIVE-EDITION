@@ -12,15 +12,15 @@ ADonkeyKongDeluxeGameMode::ADonkeyKongDeluxeGameMode()
 	DefaultPawnClass = ADKCPlayerCharacter::StaticClass();
 	VidasActuales = 3;
 
-	// 2. (LA SOLUCIÓN)
+	// 2. (LA SOLUCI?N)
 	// Le decimos al GameMode que use nuestro Controlador C++
 	PlayerControllerClass = ADKCPlayerController::StaticClass();
 
-	// 3. (LA SOLUCIÓN)
+	// 3. (LA SOLUCI?N)
 	// Dejamos la clase HUD por defecto. Ya no la usamos.
 	HUDClass = AHUD::StaticClass();
 
-	// (Asegúrate de que no haya FClassFinder para el HUD aquí)
+	// (Aseg?rate de que no haya FClassFinder para el HUD aqu?)
 }
 void ADonkeyKongDeluxeGameMode::JugadorMurio(AController* ControladorDelJugador)
 {

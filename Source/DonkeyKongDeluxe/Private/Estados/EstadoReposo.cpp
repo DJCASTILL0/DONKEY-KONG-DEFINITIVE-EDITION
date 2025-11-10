@@ -4,15 +4,13 @@
 #include "Personaje/DKCPlayerCharacter.h" 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Estados/EstadoSalto.h"
-#include "Estados/EstadoRodarTierra.h" // Incluido para la transicion
+#include "Estados/EstadoRodarTierra.h" 
 
-UEstadoReposo::UEstadoReposo()
-{
-}
+UEstadoReposo::UEstadoReposo() {}
 
-void UEstadoReposo::OnEnter(ADKCPlayerCharacter* PersonajeReferencia)
+void UEstadoReposo::OnEnter(ADKCPlayerCharacter* PersonajeReferencia, AActor* ActorReferencia)
 {
-	Super::OnEnter(PersonajeReferencia);
+	Super::OnEnter(PersonajeReferencia, ActorReferencia);
 	UE_LOG(LogTemp, Warning, TEXT("Estado: Entrando en Reposo/Caminando"));
 }
 
@@ -24,13 +22,9 @@ void UEstadoReposo::OnExit()
 
 void UEstadoReposo::TickState(float DeltaTime)
 {
-	// Transicion: Si el personaje empieza a caer 
 	if (Personaje && Personaje->GetCharacterMovement()->IsFalling())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TRANSICION: De Reposo a Salto/Caida (inicio de caida)"));
-
-		UEstadoSalto* NuevoEstado = NewObject<UEstadoSalto>(Personaje);
-		Personaje->CambiarEstado(NuevoEstado);
+		Personaje->CambiarEstado(NewObject<UEstadoSalto>(Personaje));
 	}
 }
 
@@ -39,18 +33,24 @@ void UEstadoReposo::ManejarInputSalto()
 	if (Personaje)
 	{
 		Personaje->Jump();
-
-		// Transicion inmediata al estado de Salto/Caida
-		UEstadoSalto* NuevoEstado = NewObject<UEstadoSalto>(Personaje);
-		Personaje->CambiarEstado(NuevoEstado);
+		Personaje->CambiarEstado(NewObject<UEstadoSalto>(Personaje));
 	}
 }
 
 void UEstadoReposo::ManejarInputRodar()
 {
-	// Solo permitimos rodar si el personaje esta en el suelo
 	if (Personaje)
 	{
-		Personaje->EjecutarRodarAccion(); // Delega a la estrategia de DK/Diddy
+		Personaje->EjecutarRodarAccion();
+	}
+}
+
+// (NUEVA FUNCIÓN C++)
+void UEstadoReposo::ManejarInputMoverDerecha(float Valor)
+{
+	// Esta es la lógica de movimiento C++ que antes estaba en DKCPlayerCharacter
+	if (Personaje && Personaje->GetController() != nullptr && Valor != 0.0f)
+	{
+		Personaje->AddMovementInput(FVector(0.f, -1.f, 0.f), Valor);
 	}
 }

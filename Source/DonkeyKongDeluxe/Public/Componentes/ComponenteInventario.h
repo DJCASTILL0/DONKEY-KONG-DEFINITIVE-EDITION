@@ -1,17 +1,12 @@
 // RUTA: Source/DonkeyKongDeluxe/Public/Componentes/ComponenteInventario.h
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "ComponenteInventario.generated.h"
 
-// Delegado (Observador) para el HUD de bananas
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBananasCambiadas, int, TotalBananas);
-
-// (NUEVO) Delegado (Observador) para el HUD de vidas
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVidasCambiadas, int, TotalVidas);
-
 
 UCLASS(ClassGroup = (DKCComponentes), meta = (BlueprintSpawnableComponent))
 class DONKEYKONGDELUXE_API UComponenteInventario : public UActorComponent
@@ -21,32 +16,36 @@ class DONKEYKONGDELUXE_API UComponenteInventario : public UActorComponent
 public:
 	UComponenteInventario();
 
-	// --- Delegados (Observadores) ---
+	// --- Delegados (Observador) ---
 	UPROPERTY()
 	FOnBananasCambiadas EnBananasCambiadas;
-
-	// (NUEVO)
 	UPROPERTY()
 	FOnVidasCambiadas EnVidasCambiadas;
 
-	// --- Funciones Publicas ---
-	void AnadirBanana();
-	void AnadirLetraKONG(); // (NUEVO)
+	// --- Funciones Publicas (Interfaz C++ para Consumibles) ---
+	void AnadirBanana(); // (Para la banana de 1)
+	void AnadirLetraKONG();
+
+	// (NUEVO) Para la BananaMD
+	void AnadirBananas(int Cantidad);
+
+	// (NUEVO) Para los Globos
+	void AnadirVidas(int Cantidad);
 
 	// --- Getters ---
 	int GetConteoBananas() const { return ConteoBananas; }
-	int GetVidas() const { return Vidas; } // (NUEVO)
-	int GetLetrasKONG() const { return ConteoLetrasKONG; } // (NUEVO)
+	int GetVidas() const { return Vidas; }
+	int GetLetrasKONG() const { return ConteoLetrasKONG; }
 
 protected:
 	virtual void BeginPlay() override;
 
-	// --- Variables C++ Puras (Sin UPROPERTY) ---
+	// --- Variables C++ Puras ---
 	int ConteoBananas;
 	int Vidas;
-	int ConteoLetrasKONG; // (NUEVO)
+	int ConteoLetrasKONG;
 
 private:
-	// --- Funciones Internas ---
-	void GanarVida(); // (NUEVO)
+	// --- Funciones Internas C++ ---
+	void GanarVida(); // (Ahora solo añade 1 vida)
 };

@@ -1,14 +1,13 @@
 // RUTA: Source/DonkeyKongDeluxe/Public/Componentes/ComponenteSalud.h
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "ComponenteSalud.generated.h"
 
-// Los delegados NECESITAN UPROPERTY para funcionar con el sistema de eventos de Unreal.
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaludCambiada, float, SaludActual);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMuerte);
+
 
 UCLASS(ClassGroup = (DKCComponentes), meta = (BlueprintSpawnableComponent))
 class DONKEYKONGDELUXE_API UComponenteSalud : public UActorComponent
@@ -18,22 +17,32 @@ class DONKEYKONGDELUXE_API UComponenteSalud : public UActorComponent
 public:
 	UComponenteSalud();
 
-	// Estas son ahora variables C++ puras. No apareceran en el editor.
+	// --- Variables C++ Puras ---
 	float SaludMaxima;
 	float SaludActual;
+	bool bPuedeSerInvulnerable; // Para el Jugador
+	bool bEsInvencible; // Para Zinger/Octoprus
 
-	// Delegados (Observador) - Necesitan UPROPERTY para el sistema de reflexión
-	UPROPERTY()
+	// --- Delegados (Observador) ---
+	UPROPERTY(BlueprintAssignable)
 	FOnSaludCambiada EnSaludCambiada;
-
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnMuerte EnMuerte;
 
-	// Funciones publicas
+	// --- Funciones Publicas ---
 	void RecibirDanio(float DanioAplicado);
 	FORCEINLINE float GetSaludActual() const { return SaludActual; }
 	FORCEINLINE float GetSaludMaxima() const { return SaludMaxima; }
 
+	// (NUEVO) Getter C++ para que el jugador sepa si el enemigo es invencible
+	FORCEINLINE bool EsInvencible() const { return bEsInvencible; }
+
 protected:
 	virtual void BeginPlay() override;
+
+	// --- Lógica de Invulnerabilidad ---
+	bool bEsInvulnerable;
+	float DuracionInvulnerabilidad;
+	FTimerHandle TimerHandle_Invulnerabilidad;
+	void TerminarInvulnerabilidad();
 };

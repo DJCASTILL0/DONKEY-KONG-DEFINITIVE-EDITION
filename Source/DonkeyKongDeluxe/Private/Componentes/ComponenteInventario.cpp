@@ -5,18 +5,14 @@
 UComponenteInventario::UComponenteInventario()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// Inicializamos todas las variables C++
 	ConteoBananas = 0;
-	Vidas = 3; // El GameMode ya no necesita llevar la cuenta
+	Vidas = 3;
 	ConteoLetrasKONG = 0;
 }
 
 void UComponenteInventario::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Notificar al HUD del valor inicial de ambos
 	EnBananasCambiadas.Broadcast(ConteoBananas);
 	EnVidasCambiadas.Broadcast(Vidas);
 }
@@ -25,23 +21,41 @@ void UComponenteInventario::GanarVida()
 {
 	Vidas++;
 	UE_LOG(LogTemp, Warning, TEXT("¡1-UP! Vidas restantes: %d"), Vidas);
-
-	// Notificar al HUD que las vidas cambiaron
 	EnVidasCambiadas.Broadcast(Vidas);
 }
 
+// (NUEVA FUNCIÓN PÚBLICA C++)
+void UComponenteInventario::AnadirVidas(int Cantidad)
+{
+	for (int i = 0; i < Cantidad; ++i)
+	{
+		GanarVida();
+	}
+}
+
+// (LÓGICA DE BANANA 1-UP MOVIDA A 'AnadirBananas')
 void UComponenteInventario::AnadirBanana()
 {
-	ConteoBananas++;
-	UE_LOG(LogTemp, Warning, TEXT("Banana recogida! Total: %d"), ConteoBananas);
+	AnadirBananas(1); // Llama a la nueva función
+}
+
+// (NUEVA FUNCIÓN PÚBLICA C++)
+void UComponenteInventario::AnadirBananas(int Cantidad)
+{
+	ConteoBananas += Cantidad;
+	UE_LOG(LogTemp, Warning, TEXT("Bananas recogidas! Total: %d"), ConteoBananas);
 	EnBananasCambiadas.Broadcast(ConteoBananas);
 
-	// (NUEVA LÓGICA 1-UP) [cite: 32]
-	if (ConteoBananas >= 5)
+	// Lógica de 1-UP
+	if (ConteoBananas >= 50)
 	{
-		ConteoBananas = 0; // Reiniciamos el contador
-		EnBananasCambiadas.Broadcast(ConteoBananas); // Notificamos al HUD el reseteo
-		GanarVida();
+		// Calculamos cuántas vidas ganó
+		int VidasGanadas = FMath::FloorToInt(ConteoBananas / 50.0f);
+		AnadirVidas(VidasGanadas);
+
+		// Reiniciamos el contador (guardando el sobrante)
+		ConteoBananas = ConteoBananas % 50;
+		EnBananasCambiadas.Broadcast(ConteoBananas);
 	}
 }
 
@@ -49,12 +63,10 @@ void UComponenteInventario::AnadirLetraKONG()
 {
 	ConteoLetrasKONG++;
 	UE_LOG(LogTemp, Warning, TEXT("Letra KONG recogida! Total: %d"), ConteoLetrasKONG);
-	// (TAREA FUTURA: Notificar al HUD del cambio de letras si es necesario)
 
-	// (NUEVA LÓGICA 1-UP) 
 	if (ConteoLetrasKONG >= 4)
 	{
-		ConteoLetrasKONG = 0; // Reiniciamos el contador
-		GanarVida();
+		ConteoLetrasKONG = 0;
+		GanarVida(); // Ganar 1 vida
 	}
 }

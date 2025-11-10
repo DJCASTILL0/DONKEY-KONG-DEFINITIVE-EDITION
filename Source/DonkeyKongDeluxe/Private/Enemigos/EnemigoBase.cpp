@@ -3,7 +3,7 @@
 #include "Enemigos/EnemigoBase.h"
 
 // Includes del Motor
-#include "Components/CapsuleComponent.h" // <-- ¡ESTE ES EL INCLUDE CORREGIDO!
+#include "Components/CapsuleComponent.h" // <-- (El include que faltaba)
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Componentes/ComponenteSalud.h"
 #include "Personaje/DKCPlayerCharacter.h" 
@@ -23,8 +23,14 @@ AEnemigoBase::AEnemigoBase()
 	VelocidadPatrulla = 150.0f;
 	DireccionActual = 1.0f;
 
+	// (ADAPTACIÓN C++) Por defecto, los enemigos son terrestres
+	bPatrullaSoloEnAgua = false;
+
 	// 3. Adjuntar la funcion de choque (Hit) a la capsula de colision
+	// (Esta es la lógica de "BANDERA 8vip" que SÍ funciona)
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemigoBase::OnHit);
+
+	
 }
 
 void AEnemigoBase::BeginPlay()
@@ -35,22 +41,45 @@ void AEnemigoBase::BeginPlay()
 	{
 		ComponenteSalud->EnMuerte.AddDynamic(this, &AEnemigoBase::AlEnemigoMorir);
 	}
+	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemigoBase::OnHit);
 }
 
 void AEnemigoBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Lógica de Patrulla Básica
-	AddMovementInput(FVector(0.f, -1.f, 0.f), DireccionActual * VelocidadPatrulla * DeltaTime);
+	// --- (ADAPTACIÓN C++) ---
+	// Re-integramos la lógica de patrulla acuática/terrestre
 
-	// Rotar al enemigo para que mire en la direccion de movimiento (visual)
-	if (GetCharacterMovement()->Velocity.SizeSquared() > 0.0f)
+	bool bPuedeMoverse = false;
+	UCharacterMovementComponent* Movimiento = GetCharacterMovement();
+
+	if (bPatrullaSoloEnAgua)
 	{
-		FRotator NewRotation = GetCharacterMovement()->Velocity.Rotation();
-		NewRotation.Pitch = 0.0f;
-		NewRotation.Roll = 0.0f;
-		SetActorRotation(NewRotation);
+		// Si soy acuático, solo me muevo si estoy en 'MOVE_Swimming'
+		bPuedeMoverse = Movimiento && Movimiento->IsSwimming();
+	}
+	else
+	{
+		// Si soy terrestre, solo me muevo si estoy en 'MOVE_Walking'
+		bPuedeMoverse = Movimiento && Movimiento->IsMovingOnGround();
+	}
+
+	// --- FIN DE ADAPTACIÓN ---
+
+	if (bPuedeMoverse)
+	{
+		// Lógica de Patrulla Básica
+		AddMovementInput(FVector(0.f, -1.f, 0.f), DireccionActual * VelocidadPatrulla * DeltaTime);
+
+		// Rotar al enemigo para que mire en la direccion de movimiento (visual)
+		if (GetCharacterMovement()->Velocity.SizeSquared() > 0.0f)
+		{
+			FRotator NewRotation = GetCharacterMovement()->Velocity.Rotation();
+			NewRotation.Pitch = 0.0f;
+			NewRotation.Roll = 0.0f;
+			SetActorRotation(NewRotation);
+		}
 	}
 }
 
@@ -65,9 +94,10 @@ void AEnemigoBase::AlEnemigoMorir()
 void AEnemigoBase::InvertirDireccion()
 {
 	DireccionActual *= -1.0f;
-	UE_LOG(LogTemp, Warning, TEXT("Direccion de Enemigo invertida."));
+	// UE_LOG(LogTemp, Warning, TEXT("Direccion de Enemigo invertida.")); // (Opcional)
 }
 
+// (Esta es tu función OnHit C++ correcta de "BANDERA 8vip")
 void AEnemigoBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ADKCPlayerCharacter* Jugador = Cast<ADKCPlayerCharacter>(OtherActor);

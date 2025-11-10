@@ -1,5 +1,4 @@
 // RUTA: Source/DonkeyKongDeluxe/Public/Estados/EstadoSalto.h
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -13,12 +12,13 @@ class DONKEYKONGDELUXE_API UEstadoSalto : public UPlayerBaseState
 
 public:
 	UEstadoSalto();
-
-	virtual void OnEnter(ADKCPlayerCharacter* PersonajeReferencia) override;
+	virtual void OnEnter(ADKCPlayerCharacter* PersonajeReferencia, AActor* ActorReferencia = nullptr) override;
 	virtual void OnExit() override;
 	virtual void TickState(float DeltaTime) override;
 
-	// Bloqueamos saltar y rodar en el aire
 	virtual void ManejarInputSalto() override {}
 	virtual void ManejarInputRodar() override {}
+
+	// (LA CORRECCIÓN C++) Añadimos la declaración que faltaba
+	virtual void ManejarInputMoverDerecha(float Valor) override;
 };

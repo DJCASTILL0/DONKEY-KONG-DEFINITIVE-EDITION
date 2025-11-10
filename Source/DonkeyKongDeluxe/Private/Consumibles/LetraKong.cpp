@@ -27,18 +27,18 @@ ALetraKong::ALetraKong()
 	ColisionEsfera->OnComponentBeginOverlap.AddDynamic(this, &ALetraKong::OnOverlap);
 }
 
+// ... (Constructor y BeginPlay sin cambios) ...
+
 void ALetraKong::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// 1. Verificar si fue el Jugador
 	ADKCPlayerCharacter* Jugador = Cast<ADKCPlayerCharacter>(OtherActor);
 	if (Jugador)
 	{
-		// 2. Obtener el inventario del jugador
 		UComponenteInventario* Inventario = Jugador->GetComponenteInventario();
-
 		if (Inventario)
 		{
-			// 3. Llamamos a la nueva función y destruimos el actor
+			// (LA CORRECCIÓN)
+			// Llamamos a la función que añade 1 letra
 			Inventario->AnadirLetraKONG();
 			Destroy();
 		}

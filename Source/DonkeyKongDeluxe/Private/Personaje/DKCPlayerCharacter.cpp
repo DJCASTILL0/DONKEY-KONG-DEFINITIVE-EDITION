@@ -12,17 +12,21 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
-#include "Blueprint/UserWidget.h" // Necesario para CreateWidget
 
 // Includes del Proyecto
+#include "Estados/EstadoEnBarril.h"
 #include "Componentes/ComponenteSalud.h"
 #include "Componentes/ComponenteInventario.h"
-#include "UI/DKCHud.h"
 #include "Estados/PlayerBaseState.h"
 #include "Estados/EstadoReposo.h"
+#include "Estados/EstadoNadar.h"
+#include "Estados/EstadoRodarTierra.h" 
 #include "Estrategias/PlayerStrategy.h"
 #include "Estrategias/DonkeyKongStrategy.h"
+#include "Estrategias/DiddyKongStrategy.h" // (NUEVO)
 #include "Enemigos/EnemigoBase.h"
+#include "Estados/EstadoSalto.h"
+
 
 ADKCPlayerCharacter::ADKCPlayerCharacter()
 {
@@ -40,16 +44,35 @@ ADKCPlayerCharacter::ADKCPlayerCharacter()
 	// 2?? CONFIGURACION DEL MESH
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -90.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> PlayerMeshObject(TEXT("/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin"));
-	if (PlayerMeshObject.Succeeded())
+
+	// Malla Donkey (Mannequin normal)
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MallaDonkeyObj(TEXT("/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin"));
+	if (MallaDonkeyObj.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(PlayerMeshObject.Object);
+		MallaDonkey = MallaDonkeyObj.Object;
 	}
-	static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAnimBPClass(TEXT("/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C"));
-	if (PlayerAnimBPClass.Succeeded())
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimDonkeyClass(TEXT("/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C"));
+	if (AnimDonkeyClass.Succeeded())
 	{
-		GetMesh()->SetAnimInstanceClass(PlayerAnimBPClass.Class);
+		AnimClassDonkey = AnimDonkeyClass.Class;
 	}
+
+	// Malla Diddy (Mannequin Femenino como marcador de posición C++)
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MallaDiddyObj(TEXT("/Game/Mannequin/Character/Mesh/SK_Mannequin_Female.SK_Mannequin_Female"));
+	if (MallaDiddyObj.Succeeded())
+	{
+		MallaDiddy = MallaDiddyObj.Object;
+	}
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimDiddyClass(TEXT("/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C"));
+	if (AnimDiddyClass.Succeeded())
+	{
+		AnimClassDiddy = AnimDiddyClass.Class;
+	}
+
+	// Asignamos la malla C++ por defecto (Donkey)
+	GetMesh()->SetSkeletalMesh(MallaDonkey);
+	GetMesh()->SetAnimInstanceClass(AnimClassDonkey);
+
 
 	// 3?? CAMARA
 	BrazoCamara = CreateDefaultSubobject<USpringArmComponent>(TEXT("BrazoCamara"));
@@ -63,18 +86,19 @@ ADKCPlayerCharacter::ADKCPlayerCharacter()
 	CamaraSeguimiento->bUsePawnControlRotation = false;
 
 	// 4?? ESTRATEGIA Y COMPONENTES
-	EstrategiaActual = CreateDefaultSubobject<UDonkeyKongStrategy>(TEXT("EstrategiaPorDefecto"));
+	EstrategiaActual = nullptr; // Se asigna en BeginPlay
 	ComponenteSalud = CreateDefaultSubobject<UComponenteSalud>(TEXT("ComponenteSalud"));
+	ComponenteSalud->bPuedeSerInvulnerable = true;
 	ComponenteInventario = CreateDefaultSubobject<UComponenteInventario>(TEXT("ComponenteInventario"));
 
 	// 5?? EVENTO DE CHOQUE Y COLISIÓN
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADKCPlayerCharacter::OnHit);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 
-	// Esta es la configuracion de colision robusta C++:
+	// Configuración de colisión C++ (robusta)
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap); // Bananas, Triggers
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block); // Suelo
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block); // Suelo, Llantas Sólidas
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block); // Enemigos
 }
 
@@ -82,11 +106,14 @@ void ADKCPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// (Mensaje de depuración - puedes quitarlo si quieres)
+	// (Mensaje de depuración)
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("¡SOY EL PERSONAJE C++ CORRECTO (DKCPlayerCharacter)!"));
 	}
+
+	// Establecemos la Estrategia C++ inicial
+	SetEstrategia(UDonkeyKongStrategy::StaticClass());
 
 	// Estado inicial
 	UEstadoReposo* EstadoInicial = NewObject<UEstadoReposo>(this);
@@ -95,20 +122,11 @@ void ADKCPlayerCharacter::BeginPlay()
 		CambiarEstado(EstadoInicial);
 	}
 
-	// Estrategia inicial
-	if (EstrategiaActual)
-	{
-		EstrategiaActual->SetPersonaje(this);
-		EstrategiaActual->AjustarParametrosMovimiento();
-	}
-
 	// Salud y muerte
 	if (ComponenteSalud)
 	{
 		ComponenteSalud->EnMuerte.AddDynamic(this, &ADKCPlayerCharacter::AlJugadorMorir);
 	}
-
-	// (El PlayerController se encarga del HUD, esta sección ya está limpia)
 }
 
 
@@ -130,13 +148,28 @@ void ADKCPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ADKCPlayerCharacter::SaltarPresionado);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ADKCPlayerCharacter::RodarPresionado);
+	PlayerInputComponent->BindAxis("MoveUp", this, &ADKCPlayerCharacter::MoverArriba);
+
+	// (NUEVO) Input C++ para cambiar de personaje
+	PlayerInputComponent->BindAction("CambiarPersonaje", IE_Pressed, this, &ADKCPlayerCharacter::CambiarPersonajePresionado);
 }
 
 void ADKCPlayerCharacter::MoverDerecha(float Valor)
 {
-	if (Controller != nullptr && Valor != 0.0f)
+	// (NUEVO) Delegamos el input C++ al estado actual
+	if (EstadoActual)
 	{
-		AddMovementInput(FVector(0.f, -1.f, 0.f), Valor);
+		// Si estamos en UEstadoEnBarril, él rotará el barril.
+		// Si estamos en UEstadoReposo, él moverá el personaje.
+		EstadoActual->ManejarInputMoverDerecha(Valor);
+	}
+}
+
+void ADKCPlayerCharacter::MoverArriba(float Valor)
+{
+	if (EstadoActual)
+	{
+		EstadoActual->ManejarInputMoverArriba(Valor);
 	}
 }
 
@@ -156,7 +189,7 @@ void ADKCPlayerCharacter::RodarPresionado()
 	}
 }
 
-void ADKCPlayerCharacter::CambiarEstado(UPlayerBaseState* NuevoEstado)
+void ADKCPlayerCharacter::CambiarEstado(UPlayerBaseState* NuevoEstado, AActor* ActorReferencia)
 {
 	if (EstadoActual)
 	{
@@ -165,7 +198,8 @@ void ADKCPlayerCharacter::CambiarEstado(UPlayerBaseState* NuevoEstado)
 	EstadoActual = NuevoEstado;
 	if (EstadoActual)
 	{
-		EstadoActual->OnEnter(this);
+		// Pasamos la referencia C++ al nuevo estado
+		EstadoActual->OnEnter(this, ActorReferencia);
 	}
 }
 
@@ -182,6 +216,7 @@ void ADKCPlayerCharacter::EjecutarRodarAccion()
 	}
 }
 
+// (FUNCIÓN SetEstrategia MODIFICADA)
 void ADKCPlayerCharacter::SetEstrategia(TSubclassOf<UPlayerStrategy> NuevaClaseEstrategia)
 {
 	if (NuevaClaseEstrategia)
@@ -191,10 +226,31 @@ void ADKCPlayerCharacter::SetEstrategia(TSubclassOf<UPlayerStrategy> NuevaClaseE
 		{
 			EstrategiaActual->SetPersonaje(this);
 			EstrategiaActual->AjustarParametrosMovimiento();
-			UE_LOG(LogTemp, Warning, TEXT("Strategy Changed to: %s"), *EstrategiaActual->GetName());
+
+			// (CORREGIDO) Pasamos 'this' (este) como referencia
+			EstrategiaActual->AplicarMallaEAnimacion(this);
+
+			UE_LOG(LogTemp, Warning, TEXT("Estrategia C++ Cambiada a: %s"), *EstrategiaActual->GetName());
 		}
 	}
 }
+
+// (NUEVA FUNCIÓN C++)
+void ADKCPlayerCharacter::CambiarPersonajePresionado()
+{
+	if (!EstrategiaActual) return;
+
+	// Lógica de cambio C++
+	if (EstrategiaActual->IsA<UDonkeyKongStrategy>())
+	{
+		SetEstrategia(UDiddyKongStrategy::StaticClass());
+	}
+	else
+	{
+		SetEstrategia(UDonkeyKongStrategy::StaticClass());
+	}
+}
+
 
 void ADKCPlayerCharacter::AlJugadorMorir()
 {
@@ -210,18 +266,57 @@ void ADKCPlayerCharacter::AlJugadorMorir()
 
 void ADKCPlayerCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// Esta función ahora solo se preocupa por los Enemigos
+	// 1. ¿Chocamos con un Enemigo?
 	AEnemigoBase* Enemigo = Cast<AEnemigoBase>(OtherActor);
 	if (Enemigo)
 	{
-		if (GetVelocity().Z < 0) // Pisotón
+		// 1b. (NUEVO) ¿El enemigo es invencible?
+		if (Enemigo->GetComponenteSalud() && Enemigo->GetComponenteSalud()->EsInvencible())
 		{
-			Enemigo->GetComponenteSalud()->RecibirDanio(1.0f);
-			LaunchCharacter(FVector(0.f, 0.f, 600.f), false, false);
+			// Si es invencible (Zinger), NOSOTROS recibimos daño.
+			ComponenteSalud->RecibirDanio(1.0f);
+			return; // No hay pisotón ni roll
 		}
-		else // Choque Lateral
+
+		// --- Si NO es invencible ---
+
+		// 2. ¿Es un Pisotón? (Jugador cayendo)
+		if (GetVelocity().Z < 0)
+		{
+			Enemigo->GetComponenteSalud()->RecibirDanio(5.0f);
+			LaunchCharacter(FVector(0.f, 0.f, 600.f), false, false); // Rebote normal
+		}
+		// 3. ¿Estamos Rodando?
+		else if (EstadoActual && EstadoActual->EstaAtacando())
+		{
+			Enemigo->GetComponenteSalud()->RecibirDanio(3.0f);
+		}
+		// 4. Si no es Pisotón ni Roll... es Choque Lateral (recibimos daño)
+		else
 		{
 			ComponenteSalud->RecibirDanio(1.0f);
+		}
+	}
+}
+
+void ADKCPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+
+	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Swimming)
+	{
+		if (EstadoActual && !EstadoActual->IsA<UEstadoNadar>())
+		{
+			// (MODIFICADO) Usamos la nueva firma C++
+			CambiarEstado(NewObject<UEstadoNadar>(this));
+		}
+	}
+	else if (PrevMovementMode == EMovementMode::MOVE_Swimming)
+	{
+		if (EstadoActual && !EstadoActual->IsA<UEstadoReposo>())
+		{
+			// (MODIFICADO) Usamos la nueva firma C++
+			CambiarEstado(NewObject<UEstadoReposo>(this));
 		}
 	}
 }

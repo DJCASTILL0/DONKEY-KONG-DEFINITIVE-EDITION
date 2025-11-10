@@ -1,12 +1,12 @@
 // RUTA: Source/DonkeyKongDeluxe/Public/Estados/PlayerBaseState.h
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "PlayerBaseState.generated.h"
 
-class ADKCPlayerCharacter; // Declaracion anticipada
+class ADKCPlayerCharacter;
+class AActor;
 
 UCLASS(Abstract, BlueprintType)
 class DONKEYKONGDELUXE_API UPlayerBaseState : public UObject
@@ -18,14 +18,16 @@ protected:
 	ADKCPlayerCharacter* Personaje;
 
 public:
-	// **FUNCIONES VIRTUALES (EL CONTRATO)**
-	virtual void OnEnter(ADKCPlayerCharacter* PersonajeReferencia);
+	virtual void OnEnter(ADKCPlayerCharacter* PersonajeReferencia, AActor* ActorReferencia = nullptr);
 	virtual void OnExit();
 	virtual void TickState(float DeltaTime);
 
-	// **MANEJADORES DE INPUT**
+	// --- Inputs C++ ---
 	virtual void ManejarInputSalto();
 	virtual void ManejarInputRodar();
+	virtual bool EstaAtacando() const;
+	virtual void ManejarInputMoverArriba(float Valor);
 
-	// La funcion ManejarInputMoverArriba ha sido eliminada.
+	// (NUEVO) Input C++ para rotar el barril
+	virtual void ManejarInputMoverDerecha(float Valor);
 };

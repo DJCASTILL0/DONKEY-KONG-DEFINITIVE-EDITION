@@ -7,7 +7,7 @@
 
 ADKCPlayerController::ADKCPlayerController()
 {
-	// (LA SOLUCIÓN C++ PURO)
+	// (LA SOLUCI?N C++ PURO)
 	// Cargamos la referencia a tu asset de Blueprint reparado
 
 	const TCHAR* RutaHUD = TEXT("/Game/100por100Terminados/WBP_JugadorHUD.WBP_JugadorHUD_C");
@@ -19,7 +19,7 @@ ADKCPlayerController::ADKCPlayerController()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("ADKCPlayerController: ¡NO SE PUDO ENCONTRAR WBP_JugadorHUD!"));
+		UE_LOG(LogTemp, Error, TEXT("ADKCPlayerController: ?NO SE PUDO ENCONTRAR WBP_JugadorHUD!"));
 	}
 }
 
@@ -27,10 +27,10 @@ void ADKCPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Si el C++ encontró la clase en el constructor...
+	// Si el C++ encontr? la clase en el constructor...
 	if (HUDWidgetClass)
 	{
-		// ...creamos el widget y lo añadimos a la pantalla.
+		// ...creamos el widget y lo a?adimos a la pantalla.
 		HUDWidgetInstance = CreateWidget<UDKCHud>(this, HUDWidgetClass);
 		if (HUDWidgetInstance)
 		{

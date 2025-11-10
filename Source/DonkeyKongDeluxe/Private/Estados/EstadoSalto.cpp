@@ -5,13 +5,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Estados/EstadoReposo.h" 
 
-UEstadoSalto::UEstadoSalto()
-{
-}
+UEstadoSalto::UEstadoSalto() {}
 
-void UEstadoSalto::OnEnter(ADKCPlayerCharacter* PersonajeReferencia)
+void UEstadoSalto::OnEnter(ADKCPlayerCharacter* PersonajeReferencia, AActor* ActorReferencia)
 {
-	Super::OnEnter(PersonajeReferencia);
+	Super::OnEnter(PersonajeReferencia, ActorReferencia);
 	UE_LOG(LogTemp, Warning, TEXT("Estado: Entrando en Salto/Caida"));
 }
 
@@ -23,11 +21,18 @@ void UEstadoSalto::OnExit()
 
 void UEstadoSalto::TickState(float DeltaTime)
 {
-	// Transicion: Si el personaje toca el suelo
 	if (Personaje && !Personaje->GetCharacterMovement()->IsFalling())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TRANSICION: De Salto/Caida a Reposo (aterrizaje)"));
 		Personaje->CambiarEstado(NewObject<UEstadoReposo>(Personaje));
 	}
 }
-// Las funciones ManejarInputSalto y ManejarInputRodar estan vacias, bloqueando acciones.
+
+// (NUEVA FUNCIÓN C++)
+void UEstadoSalto::ManejarInputMoverDerecha(float Valor)
+{
+	// Lógica de control aéreo C++
+	if (Personaje && Personaje->GetController() != nullptr && Valor != 0.0f)
+	{
+		Personaje->AddMovementInput(FVector(0.f, -1.f, 0.f), Valor);
+	}
+}

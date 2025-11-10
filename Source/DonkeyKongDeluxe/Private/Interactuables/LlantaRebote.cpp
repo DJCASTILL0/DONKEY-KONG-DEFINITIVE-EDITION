@@ -6,7 +6,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/StaticMesh.h"
 
-// Includes para la lógica de Overlap
+// Includes para la l?gica de Overlap
 #include "Personaje/DKCPlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Estados/EstadoSalto.h" // Para forzar el estado de salto
@@ -16,19 +16,19 @@ ALlantaRebote::ALlantaRebote()
 	PrimaryActorTick.bCanEverTick = false;
 	FuerzaRebote = 1200.0f;
 
-	// 1. (NUEVO) El Mesh SÓLIDO (Raíz)
+	// 1. (NUEVO) El Mesh S?LIDO (Ra?z)
 	MeshLlanta = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshLlanta"));
 	RootComponent = MeshLlanta;
-	// Configuramos el mesh para ser SÓLIDO y bloquear al jugador
+	// Configuramos el mesh para ser S?LIDO y bloquear al jugador
 	MeshLlanta->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 
 	// 2. (NUEVO) La Zona de Rebote (Trigger)
 	ZonaRebote = CreateDefaultSubobject<UBoxComponent>(TEXT("ZonaRebote"));
 	ZonaRebote->SetupAttachment(RootComponent); // Se adjunta al mesh
-	// Hacemos la caja un poco más ancha y alta que el mesh
+	// Hacemos la caja un poco m?s ancha y alta que el mesh
 	ZonaRebote->SetRelativeLocation(FVector(0.f, 0.f, 10.f));
 	ZonaRebote->SetBoxExtent(FVector(60.f, 60.f, 30.f));
-	// Usamos el perfil que SÍ funciona
+	// Usamos el perfil que S? funciona
 	ZonaRebote->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
 	// 3. (C++ PURO) Cargar el Mesh (Cilindro)
@@ -47,14 +47,14 @@ ALlantaRebote::ALlantaRebote()
 
 void ALlantaRebote::OnOverlapLlanta(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// 1. ¿Es el Jugador?
+	// 1. ?Es el Jugador?
 	ADKCPlayerCharacter* Jugador = Cast<ADKCPlayerCharacter>(OtherActor);
 	if (Jugador)
 	{
-		// 2. ¿Está cayendo sobre nosotros (pisotón)?
+		// 2. ?Est? cayendo sobre nosotros (pisot?n)?
 		if (Jugador->GetVelocity().Z < 0)
 		{
-			// ¡Rebote!
+			// ?Rebote!
 			Jugador->LaunchCharacter(FVector(0.f, 0.f, FuerzaRebote), false, false);
 
 			// Forzamos al jugador al estado de salto

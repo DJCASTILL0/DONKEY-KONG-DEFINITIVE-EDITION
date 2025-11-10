@@ -24,7 +24,7 @@ void UDKCHud::NativeConstruct()
 	// Si no encontramos al jugador, no podemos continuar.
 	if (!Jugador)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UDKCHud::NativeConstruct - ¡No se pudo encontrar DKCPlayerCharacter!"));
+		UE_LOG(LogTemp, Error, TEXT("UDKCHud::NativeConstruct - ?No se pudo encontrar DKCPlayerCharacter!"));
 		return;
 	}
 
@@ -53,7 +53,7 @@ void UDKCHud::NativeConstruct()
 	}
 }
 
-// --- Implementación de Callbacks de Salud ---
+// --- Implementaci?n de Callbacks de Salud ---
 
 void UDKCHud::AlSaludCambiar(float SaludActual)
 {
@@ -63,7 +63,7 @@ void UDKCHud::AlSaludCambiar(float SaludActual)
 
 void UDKCHud::ActualizarTextoSalud(float SaludActual)
 {
-	// Verificamos que el BindWidget (C++) encontrara el TextBlock (Diseñador)
+	// Verificamos que el BindWidget (C++) encontrara el TextBlock (Dise?ador)
 	if (TextoSalud)
 	{
 		// Creamos el texto formateado C++
@@ -75,7 +75,7 @@ void UDKCHud::ActualizarTextoSalud(float SaludActual)
 	}
 }
 
-// --- Implementación de Callbacks de Bananas ---
+// --- Implementaci?n de Callbacks de Bananas ---
 
 void UDKCHud::AlBananasCambiar(int TotalBananas)
 {
@@ -93,7 +93,7 @@ void UDKCHud::ActualizarTextoBananas(int TotalBananas)
 	}
 }
 
-// --- Implementación de Callbacks de Vidas ---
+// --- Implementaci?n de Callbacks de Vidas ---
 
 void UDKCHud::AlVidasCambiar(int TotalVidas)
 {
