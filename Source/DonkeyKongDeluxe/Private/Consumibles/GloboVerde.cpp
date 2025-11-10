@@ -1,4 +1,3 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/Consumibles/GloboVerde.cpp
 
 #include "Consumibles/GloboVerde.h"
 #include "Components/SphereComponent.h"

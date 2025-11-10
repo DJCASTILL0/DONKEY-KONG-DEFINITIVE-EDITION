@@ -235,12 +235,11 @@ void ADKCPlayerCharacter::SetEstrategia(TSubclassOf<UPlayerStrategy> NuevaClaseE
 	}
 }
 
-// (NUEVA FUNCIÓN C++)
+
 void ADKCPlayerCharacter::CambiarPersonajePresionado()
 {
 	if (!EstrategiaActual) return;
 
-	// Lógica de cambio C++
 	if (EstrategiaActual->IsA<UDonkeyKongStrategy>())
 	{
 		SetEstrategia(UDiddyKongStrategy::StaticClass());
@@ -270,7 +269,7 @@ void ADKCPlayerCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* Other
 	AEnemigoBase* Enemigo = Cast<AEnemigoBase>(OtherActor);
 	if (Enemigo)
 	{
-		// 1b. (NUEVO) ¿El enemigo es invencible?
+	
 		if (Enemigo->GetComponenteSalud() && Enemigo->GetComponenteSalud()->EsInvencible())
 		{
 			// Si es invencible (Zinger), NOSOTROS recibimos daño.
@@ -278,9 +277,7 @@ void ADKCPlayerCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* Other
 			return; // No hay pisotón ni roll
 		}
 
-		// --- Si NO es invencible ---
-
-		// 2. ¿Es un Pisotón? (Jugador cayendo)
+	
 		if (GetVelocity().Z < 0)
 		{
 			Enemigo->GetComponenteSalud()->RecibirDanio(5.0f);
@@ -307,7 +304,7 @@ void ADKCPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, 
 	{
 		if (EstadoActual && !EstadoActual->IsA<UEstadoNadar>())
 		{
-			// (MODIFICADO) Usamos la nueva firma C++
+			
 			CambiarEstado(NewObject<UEstadoNadar>(this));
 		}
 	}
@@ -315,7 +312,7 @@ void ADKCPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, 
 	{
 		if (EstadoActual && !EstadoActual->IsA<UEstadoReposo>())
 		{
-			// (MODIFICADO) Usamos la nueva firma C++
+
 			CambiarEstado(NewObject<UEstadoReposo>(this));
 		}
 	}

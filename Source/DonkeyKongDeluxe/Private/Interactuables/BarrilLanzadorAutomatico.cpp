@@ -38,7 +38,7 @@ ABarrilLanzadorAutomatico::ABarrilLanzadorAutomatico()
 	RetrasoLanzamiento = 0.5f;
 	JugadorAtrapado = nullptr;
 
-	// (NUEVO) Por defecto C++, los barriles son automáticos
+
 	bEsAutomatico = true;
 }
 
@@ -66,8 +66,7 @@ void ABarrilLanzadorAutomatico::OnOverlapBarril(UPrimitiveComponent* OverlappedC
 	MeshBarril->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	Jugador->CambiarEstado(NewObject<UEstadoEnBarril>(Jugador), this);
 
-	// (LA CORRECCIÓN C++)
-	// Solo iniciamos el Timer C++ si somos automáticos
+	
 	if (bEsAutomatico)
 	{
 		GetWorld()->GetTimerManager().SetTimer(

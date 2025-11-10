@@ -1,4 +1,3 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/Estados/EstadoReposo.cpp
 
 #include "Estados/EstadoReposo.h"
 #include "Personaje/DKCPlayerCharacter.h" 
@@ -45,10 +44,10 @@ void UEstadoReposo::ManejarInputRodar()
 	}
 }
 
-// (NUEVA FUNCIÓN C++)
+
 void UEstadoReposo::ManejarInputMoverDerecha(float Valor)
 {
-	// Esta es la lógica de movimiento C++ que antes estaba en DKCPlayerCharacter
+
 	if (Personaje && Personaje->GetController() != nullptr && Valor != 0.0f)
 	{
 		Personaje->AddMovementInput(FVector(0.f, -1.f, 0.f), Valor);

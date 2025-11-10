@@ -1,5 +1,3 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/Componentes/ComponenteInventario.cpp
-
 #include "Componentes/ComponenteInventario.h"
 
 UComponenteInventario::UComponenteInventario()
@@ -24,7 +22,6 @@ void UComponenteInventario::GanarVida()
 	EnVidasCambiadas.Broadcast(Vidas);
 }
 
-// (NUEVA FUNCIÓN PÚBLICA C++)
 void UComponenteInventario::AnadirVidas(int Cantidad)
 {
 	for (int i = 0; i < Cantidad; ++i)
@@ -39,7 +36,7 @@ void UComponenteInventario::AnadirBanana()
 	AnadirBananas(1); // Llama a la nueva función
 }
 
-// (NUEVA FUNCIÓN PÚBLICA C++)
+
 void UComponenteInventario::AnadirBananas(int Cantidad)
 {
 	ConteoBananas += Cantidad;
@@ -67,6 +64,6 @@ void UComponenteInventario::AnadirLetraKONG()
 	if (ConteoLetrasKONG >= 4)
 	{
 		ConteoLetrasKONG = 0;
-		GanarVida(); // Ganar 1 vida
+		GanarVida();
 	}
 }

@@ -4,10 +4,10 @@
 #include "Personaje/DKCPlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-// (LA CORRECCIÓN) La firma C++ ahora coincide con el .h
+
 void UEstadoNadar::OnEnter(ADKCPlayerCharacter* PersonajeReferencia, AActor* ActorReferencia)
 {
-	// (LA CORRECCIÓN) Pasamos ambos parámetros C++ a la función base
+
 	Super::OnEnter(PersonajeReferencia, ActorReferencia);
 	UE_LOG(LogTemp, Warning, TEXT("Estado: Entrando en Nado."));
 

@@ -20,7 +20,7 @@ ABanana::ABanana()
 	MeshBanana->SetupAttachment(RootComponent);
 
 	// 2. (C++ PURO) Cargar el Mesh
-	// Esta ruta es del motor y SIEMPRE funciona.
+	// Estas ruta es del motor y SIEMPRE funcionan, por el momento hasta que tengamops las animaciones y modelos
 	const TCHAR* RutaMesh = TEXT("/Engine/BasicShapes/Sphere.Sphere");
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshFinder(RutaMesh);
 	if (MeshFinder.Succeeded())
@@ -34,9 +34,6 @@ void ABanana::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 3. (LA CORRECCIÓN) Configurar Colisión en BeginPlay
-	// Esto anula cualquier configuracion guardada en Blueprints.
-
 	// Usamos el perfil "Trigger" (Disparador)
 	ColisionEsfera->SetCollisionProfileName(TEXT("Trigger"));
 
@@ -44,12 +41,10 @@ void ABanana::BeginPlay()
 	// - Tipo Objeto = WorldDynamic
 	// - Respuesta a Todo = Overlap
 
-	// 4. Suscribir el callback de Overlap
-	// (Lo movemos de Constructor a BeginPlay por seguridad)
 	ColisionEsfera->OnComponentBeginOverlap.AddDynamic(this, &ABanana::OnOverlap);
 }
 
-// ... (Constructor y BeginPlay sin cambios) ...
+
 
 void ABanana::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -59,8 +54,7 @@ void ABanana::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		UComponenteInventario* Inventario = Jugador->GetComponenteInventario();
 		if (Inventario)
 		{
-			// (LA CORRECCIÓN)
-			// Llamamos a la función que añade 1 banana
+	
 			Inventario->AnadirBanana();
 			Destroy();
 		}

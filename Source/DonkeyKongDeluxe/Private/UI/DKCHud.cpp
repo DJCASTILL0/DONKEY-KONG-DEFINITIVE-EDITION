@@ -1,14 +1,12 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/UI/DKCHud.cpp
 
-// DKCHud.h DEBE ser el primer include
 #include "UI/DKCHud.h" 
 
-// Includes del Proyecto
+
 #include "Componentes/ComponenteSalud.h"
 #include "Componentes/ComponenteInventario.h" 
 #include "Personaje/DKCPlayerCharacter.h" 
 
-// Includes del Motor
+
 #include "Components/TextBlock.h" // Necesario para UTextBlock
 #include "Internationalization/Text.h" // Necesario para FText
 #include "Kismet/GameplayStatics.h" // Necesario para GetPlayerCharacter
@@ -17,8 +15,7 @@ void UDKCHud::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// 1. Obtener el Personaje Jugador
-	// Usamos GetPlayerCharacter(0) para obtener el primer jugador.
+
 	ADKCPlayerCharacter* Jugador = Cast<ADKCPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	// Si no encontramos al jugador, no podemos continuar.
@@ -53,7 +50,7 @@ void UDKCHud::NativeConstruct()
 	}
 }
 
-// --- Implementaci?n de Callbacks de Salud ---
+
 
 void UDKCHud::AlSaludCambiar(float SaludActual)
 {
@@ -75,7 +72,7 @@ void UDKCHud::ActualizarTextoSalud(float SaludActual)
 	}
 }
 
-// --- Implementaci?n de Callbacks de Bananas ---
+
 
 void UDKCHud::AlBananasCambiar(int TotalBananas)
 {
@@ -93,7 +90,7 @@ void UDKCHud::ActualizarTextoBananas(int TotalBananas)
 	}
 }
 
-// --- Implementaci?n de Callbacks de Vidas ---
+
 
 void UDKCHud::AlVidasCambiar(int TotalVidas)
 {

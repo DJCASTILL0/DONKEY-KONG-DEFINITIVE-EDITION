@@ -1,4 +1,3 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/Consumibles/GloboRojo.cpp
 
 #include "Consumibles/GloboRojo.h"
 #include "Components/SphereComponent.h"
@@ -24,7 +23,6 @@ AGloboRojo::AGloboRojo()
 	{
 		MeshGlobo->SetStaticMesh(MeshFinder.Object);
 		MeshGlobo->SetRelativeScale3D(FVector(0.75f, 0.75f, 0.75f));
-		// (Puedes añadir un material rojo en C++ si quieres, pero es complejo)
 	}
 }
 

@@ -18,7 +18,7 @@ void UDiddyKongStrategy::AjustarParametrosMovimiento()
 	}
 }
 
-// (CORREGIDO) Nombre del parámetro C++
+
 void UDiddyKongStrategy::AplicarMallaEAnimacion(ADKCPlayerCharacter* PersonajeReferencia)
 {
 	if (PersonajeReferencia)

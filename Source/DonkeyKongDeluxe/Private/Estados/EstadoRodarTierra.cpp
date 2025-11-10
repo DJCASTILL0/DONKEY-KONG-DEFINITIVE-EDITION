@@ -13,10 +13,10 @@ UEstadoRodarTierra::UEstadoRodarTierra()
 	FuerzaRoll = 1000.0f;
 }
 
-// (LA CORRECCIÓN) La firma C++ ahora coincide con el .h
+
 void UEstadoRodarTierra::OnEnter(ADKCPlayerCharacter* PersonajeReferencia, AActor* ActorReferencia)
 {
-	// (LA CORRECCIÓN) Pasamos ambos parámetros C++ a la función base
+	
 	Super::OnEnter(PersonajeReferencia, ActorReferencia);
 	UE_LOG(LogTemp, Warning, TEXT("Estado: Entrando en Roll de Tierra."));
 	if (!Personaje) return;

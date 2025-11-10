@@ -1,4 +1,3 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/Estados/EstadoSalto.cpp
 
 #include "Estados/EstadoSalto.h"
 #include "Personaje/DKCPlayerCharacter.h" 
@@ -27,10 +26,10 @@ void UEstadoSalto::TickState(float DeltaTime)
 	}
 }
 
-// (NUEVA FUNCIÓN C++)
+
 void UEstadoSalto::ManejarInputMoverDerecha(float Valor)
 {
-	// Lógica de control aéreo C++
+
 	if (Personaje && Personaje->GetController() != nullptr && Valor != 0.0f)
 	{
 		Personaje->AddMovementInput(FVector(0.f, -1.f, 0.f), Valor);

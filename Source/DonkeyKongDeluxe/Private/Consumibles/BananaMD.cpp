@@ -1,4 +1,3 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/Consumibles/BananaMD.cpp
 
 #include "Consumibles/BananaMD.h"
 #include "Components/SphereComponent.h"

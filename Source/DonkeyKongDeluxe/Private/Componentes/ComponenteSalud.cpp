@@ -1,5 +1,3 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/Componentes/ComponenteSalud.cpp
-
 #include "Componentes/ComponenteSalud.h"
 #include "TimerManager.h" 
 
@@ -15,7 +13,6 @@ UComponenteSalud::UComponenteSalud()
 	bEsInvulnerable = false;
 	DuracionInvulnerabilidad = 3.0f;
 
-	// (NUEVO) Invencibilidad (Octoprus)
 	bEsInvencible = false; // Por defecto, los enemigos NO son invencibles
 }
 
@@ -27,25 +24,21 @@ void UComponenteSalud::BeginPlay()
 
 void UComponenteSalud::RecibirDanio(float DanioAplicado)
 {
-	// 1. (NUEVO) Chequeo C++ de Invencibilidad
 	if (bEsInvencible)
 	{
 		return; // Ignora todo el daño
 	}
 
-	// 2. Chequeo C++ de Invulnerabilidad (Frames)
 	if (bEsInvulnerable)
 	{
 		return;
 	}
 
-	// 3. Chequeo C++ de Muerte
 	if (SaludActual <= 0.0f)
 	{
 		return;
 	}
 
-	// 4. Aplicar daño
 	SaludActual = FMath::Clamp(SaludActual - DanioAplicado, 0.0f, SaludMaxima);
 	EnSaludCambiada.Broadcast(SaludActual);
 	UE_LOG(LogTemp, Warning, TEXT("%s recibio danio. Salud restante: %f"), *GetOwner()->GetName(), SaludActual);

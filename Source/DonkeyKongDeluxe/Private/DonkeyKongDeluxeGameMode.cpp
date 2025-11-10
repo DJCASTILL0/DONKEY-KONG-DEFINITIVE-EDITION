@@ -1,9 +1,9 @@
-// RUTA: Source/DonkeyKongDeluxe/Private/DonkeyKongDeluxeGameMode.cpp
+
 #include "DonkeyKongDeluxeGameMode.h"
 #include "Personaje/DKCPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
-// (NUEVO) Incluimos nuestro controlador C++
+
 #include "Personaje/DKCPlayerController.h"
 #include "GameFramework/HUD.h"
 ADonkeyKongDeluxeGameMode::ADonkeyKongDeluxeGameMode()
@@ -12,12 +12,10 @@ ADonkeyKongDeluxeGameMode::ADonkeyKongDeluxeGameMode()
 	DefaultPawnClass = ADKCPlayerCharacter::StaticClass();
 	VidasActuales = 3;
 
-	// 2. (LA SOLUCI?N)
-	// Le decimos al GameMode que use nuestro Controlador C++
+	
 	PlayerControllerClass = ADKCPlayerController::StaticClass();
 
-	// 3. (LA SOLUCI?N)
-	// Dejamos la clase HUD por defecto. Ya no la usamos.
+
 	HUDClass = AHUD::StaticClass();
 
 	// (Aseg?rate de que no haya FClassFinder para el HUD aqu?)

@@ -18,7 +18,6 @@ void UDonkeyKongStrategy::AjustarParametrosMovimiento()
 	}
 }
 
-// (CORREGIDO) Nombre del parámetro C++
 void UDonkeyKongStrategy::AplicarMallaEAnimacion(ADKCPlayerCharacter* PersonajeReferencia)
 {
 	if (PersonajeReferencia)
