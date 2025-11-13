@@ -8,6 +8,9 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaludCambiada, float, SaludActual);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMuerte);
 
+// (NUEVO) Delegado C++ para notificar al Jefe que ha recibido daño
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDanoRecibido);
+
 
 UCLASS(ClassGroup = (DKCComponentes), meta = (BlueprintSpawnableComponent))
 class DONKEYKONGDELUXE_API UComponenteSalud : public UActorComponent
@@ -21,7 +24,7 @@ public:
 	float SaludMaxima;
 	float SaludActual;
 	bool bPuedeSerInvulnerable; // Para el Jugador
-	bool bEsInvencible; // Para Zinger/Octoprus
+	bool bEsInvencible; // Para Zinger/Octoprus/K.Rool
 
 	// --- Delegados (Observador) ---
 	UPROPERTY(BlueprintAssignable)
@@ -29,12 +32,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnMuerte EnMuerte;
 
+	// (NUEVO) Delegado C++
+	UPROPERTY(BlueprintAssignable)
+	FOnDanoRecibido EnDanoRecibido;
+
 	// --- Funciones Publicas ---
 	void RecibirDanio(float DanioAplicado);
 	FORCEINLINE float GetSaludActual() const { return SaludActual; }
 	FORCEINLINE float GetSaludMaxima() const { return SaludMaxima; }
-
-	// (NUEVO) Getter C++ para que el jugador sepa si el enemigo es invencible
 	FORCEINLINE bool EsInvencible() const { return bEsInvencible; }
 
 protected:

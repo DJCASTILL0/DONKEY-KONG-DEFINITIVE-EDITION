@@ -106,11 +106,6 @@ void ADKCPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// (Mensaje de depuración)
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("¡SOY EL PERSONAJE C++ CORRECTO (DKCPlayerCharacter)!"));
-	}
 
 	// Establecemos la Estrategia C++ inicial
 	SetEstrategia(UDonkeyKongStrategy::StaticClass());
@@ -280,13 +275,13 @@ void ADKCPlayerCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* Other
 	
 		if (GetVelocity().Z < 0)
 		{
-			Enemigo->GetComponenteSalud()->RecibirDanio(5.0f);
+			Enemigo->GetComponenteSalud()->RecibirDanio(1.0f);
 			LaunchCharacter(FVector(0.f, 0.f, 600.f), false, false); // Rebote normal
 		}
 		// 3. ¿Estamos Rodando?
 		else if (EstadoActual && EstadoActual->EstaAtacando())
 		{
-			Enemigo->GetComponenteSalud()->RecibirDanio(3.0f);
+			Enemigo->GetComponenteSalud()->RecibirDanio(1.0f);
 		}
 		// 4. Si no es Pisotón ni Roll... es Choque Lateral (recibimos daño)
 		else

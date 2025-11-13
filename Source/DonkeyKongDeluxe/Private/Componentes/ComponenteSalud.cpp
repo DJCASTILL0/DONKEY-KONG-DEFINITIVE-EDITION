@@ -1,19 +1,17 @@
+// RUTA: Source/DonkeyKongDeluxe/Private/Componentes/ComponenteSalud.cpp
+
 #include "Componentes/ComponenteSalud.h"
 #include "TimerManager.h" 
 
 UComponenteSalud::UComponenteSalud()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
-	SaludMaxima = 3.0f;
+	SaludMaxima = 10.0f;
 	SaludActual = SaludMaxima;
-
-	// Invulnerabilidad (Jugador)
 	bPuedeSerInvulnerable = false;
+	bEsInvencible = false;
 	bEsInvulnerable = false;
 	DuracionInvulnerabilidad = 3.0f;
-
-	bEsInvencible = false; // Por defecto, los enemigos NO son invencibles
 }
 
 void UComponenteSalud::BeginPlay()
@@ -24,26 +22,17 @@ void UComponenteSalud::BeginPlay()
 
 void UComponenteSalud::RecibirDanio(float DanioAplicado)
 {
-	if (bEsInvencible)
-	{
-		return; // Ignora todo el daño
-	}
-
-	if (bEsInvulnerable)
-	{
-		return;
-	}
-
-	if (SaludActual <= 0.0f)
-	{
-		return;
-	}
+	if (bEsInvencible) return;
+	if (bEsInvulnerable) return;
+	if (SaludActual <= 0.0f) return;
 
 	SaludActual = FMath::Clamp(SaludActual - DanioAplicado, 0.0f, SaludMaxima);
 	EnSaludCambiada.Broadcast(SaludActual);
 	UE_LOG(LogTemp, Warning, TEXT("%s recibio danio. Salud restante: %f"), *GetOwner()->GetName(), SaludActual);
 
-	// 5. Activar Invulnerabilidad (SI PUEDE y si no murió)
+	// (NUEVO) Notificamos a los observadores C++ (K. Rool) que hemos sido golpeados
+	EnDanoRecibido.Broadcast();
+
 	if (bPuedeSerInvulnerable && SaludActual > 0.0f)
 	{
 		bEsInvulnerable = true;
@@ -56,7 +45,6 @@ void UComponenteSalud::RecibirDanio(float DanioAplicado)
 			DuracionInvulnerabilidad,
 			false);
 	}
-	// 6. Comprobar si ha muerto
 	else if (SaludActual <= 0.0f)
 	{
 		EnMuerte.Broadcast();
